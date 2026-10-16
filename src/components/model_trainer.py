@@ -2,7 +2,7 @@ import os
 import sys
 from dataclasses import dataclass
 
-from catboost import CatBoostClassifier
+from catboost import CatBoostRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
@@ -41,11 +41,44 @@ class ModelTrainer:
                 "Linear Regression": LinearRegression(),
                 "K-Neighbors Regressor": KNeighborsRegressor(),
                 "XGBRegressor": XGBRegressor(),
-                "CatBoosting Regressor": CatBoostClassifier(verbose=False),
+                "CatBoosting Regressor": CatBoostRegressor(verbose=False),
                 "AdaBoost Regressor": AdaBoostRegressor()
             }
 
-            model_report: dict = evaluate_models(X_train, y_train, X_test, y_test, models)
+            params = {
+                "Decision Tree": {
+                    'criterion': ['squared_error', 'absolute_error', 'poisson'],
+                },
+                "Random Forest": {
+                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                },
+                "Gradient Boosting": {
+                    'learning_rate': [.1, .01, .05, .001],
+                    'subsample': [0.6, 0.7, 0.75, 0.8, 0.85, 0.9],
+                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                },
+                "Linear Regression": {},
+                "K-Neighbors Regressor": {
+                    'n_neighbors': [5, 7, 9, 11],
+                    'weights': ['uniform', 'distance'],
+                    'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute']
+                },
+                "XGBRegressor": {
+                    'learning_rate': [.1, .01, .05, .001],
+                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                },
+                "CatBoosting Regressor": {
+                    'depth': [6, 8, 10],
+                    'learning_rate': [.1, .01, .05],
+                    'iterations': [30, 50, 100]
+                },
+                "AdaBoost Regressor": {
+                    'learning_rate': [.1, .01, 0.5, .001],
+                    'n_estimators': [8, 16, 32, 64, 128, 256]
+                }
+            }
+
+            model_report: dict = evaluate_models(X_train, y_train, X_test, y_test, models, params=params)
 
 
              #To get the best model score from the dictionary
