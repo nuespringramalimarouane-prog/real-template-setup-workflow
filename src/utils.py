@@ -7,6 +7,7 @@ import src.exception as CustomException
 import src.logger as logger
 import dill as pickle
 from sklearn.metrics import r2_score
+import dill
 
 from sklearn.model_selection import GridSearchCV
 
@@ -47,3 +48,11 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params=None):
 
     except Exception as e:
         raise CustomException(e, sys)
+
+
+def load_object(file_path):
+    try:
+        with open(file_path,"rb") as file_obj:
+            return dill.load(file_obj)
+    except Exception as e:
+        raise CustomException(e,sys)
